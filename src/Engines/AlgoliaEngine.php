@@ -119,6 +119,29 @@ class AlgoliaEngine extends BaseAlgoliaEngine
     /**
      * {@inheritdoc}
      */
+    public function search(Builder $builder)
+    {
+        return $this->performSearch($builder, array_filter([
+            'numericFilters' => $this->filters($builder),
+            'hitsPerPage' => $builder->limit,
+        ]));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function paginate(Builder $builder, $perPage, $page)
+    {
+        return $this->performSearch($builder, [
+            'numericFilters' => $this->filters($builder),
+            'hitsPerPage' => $perPage,
+            'page' => $page - 1,
+        ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function performSearch(Builder $builder, array $options = [])
     {
         $indexName = $builder->index ?: $builder->model->searchableAs();
