@@ -21,21 +21,19 @@ use Algolia\ScoutExtended\Searchable\ObjectIdEncrypter;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 use Laravel\Scout\Builder;
-use Laravel\Scout\Engines\AlgoliaEngine as BaseAlgoliaEngine;
+use Laravel\Scout\Scout;
+use function is_array;
+
+if (version_compare(Scout::VERSION, '10.11.6', '>=')) {
+    // Scout >= 10.11.6 ships Algolia4Engine for the v4 client
+    class_alias(\Laravel\Scout\Engines\Algolia4Engine::class, BaseAlgoliaEngine::class);
+} else {
+    // Legacy Laravel Scout class
+    class_alias(\Laravel\Scout\Engines\AlgoliaEngine::class, BaseAlgoliaEngine::class);
+}
 
 class AlgoliaEngine extends BaseAlgoliaEngine
 {
-    /**
-     * Create a new engine instance.
-     *
-     * @param  \Algolia\AlgoliaSearch\Api\SearchClient $algolia
-     * @return void
-     */
-    public function __construct(SearchClient $algolia)
-    {
-        parent::__construct($algolia);
-    }
-
     /**
      * @param \Algolia\AlgoliaSearch\Api\SearchClient $algolia
      *
@@ -75,50 +73,6 @@ class AlgoliaEngine extends BaseAlgoliaEngine
     /**
      * {@inheritdoc}
      */
-    public function map(Builder $builder, $results, $searchable)
-    {
-        if (count($results['hits']) === 0) {
-            return $searchable->newCollection();
-        }
-
-        return app(ModelsResolver::class)->from($builder, $searchable, $results);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function lazyMap(Builder $builder, $results, $searchable)
-    {
-        return LazyCollection::make($this->map($builder, $results, $searchable));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function flush($model)
-    {
-        $this->algolia->clearObjects($model->searchableAs());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function deleteIndex($name)
-    {
-        return $this->algolia->deleteIndex($name);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function updateIndexSettings(string $name, array $settings = [])
-    {
-        $this->algolia->setSettings($name, $settings);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function search(Builder $builder)
     {
         return $this->performSearch($builder, array_filter([
@@ -142,19 +96,21 @@ class AlgoliaEngine extends BaseAlgoliaEngine
     /**
      * {@inheritdoc}
      */
-    protected function performSearch(Builder $builder, array $options = [])
+    public function map(Builder $builder, $results, $searchable)
     {
-        $indexName = $builder->index ?: $builder->model->searchableAs();
-        $options = array_merge($builder->options, $options);
-
-        if ($builder->callback) {
-            return call_user_func($builder->callback, $this->algolia, $builder->query, $options);
+        if (count($results['hits']) === 0) {
+            return $searchable->newCollection();
         }
 
-        return $this->algolia->searchSingleIndex(
-            $indexName,
-            array_merge(['query' => $builder->query], $options)
-        );
+        return app(ModelsResolver::class)->from($builder, $searchable, $results);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function lazyMap(Builder $builder, $results, $searchable)
+    {
+        return LazyCollection::make($this->map($builder, $results, $searchable));
     }
 
     /**
