@@ -111,9 +111,7 @@ class ReImportCommand extends Command
                     $client->waitForTask($indexName, $response['taskID']);
                 }
             } catch (NotFoundException $e) {
-                try {
-                    $client->getSettings($indexName);
-                } catch (NotFoundException $unused) {
+                if (!$client->indexExists($indexName)) {
                     $response = $client->setSettings($indexName, ['attributesForFaceting' => null]);
                     $client->waitForTask($indexName, $response['taskID']);
                 }
