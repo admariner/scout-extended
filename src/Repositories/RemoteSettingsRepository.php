@@ -113,11 +113,11 @@ class RemoteSettingsRepository
     public function getSettingsRaw(string $indexName): array
     {
         try {
-            $rawSettings = $this->client->getSettings($indexName);
+            $rawSettings = $this->client->getSettings($indexName) ?? [];
         } catch (NotFoundException $e) {
             $response = $this->client->setSettings($indexName, []);
             $this->client->waitForTask($indexName, $response['taskID']);
-            $rawSettings = $this->client->getSettings($indexName);
+            $rawSettings = $this->client->getSettings($indexName) ?? [];
         }
 
         foreach (self::$aliases as $from => $to) {

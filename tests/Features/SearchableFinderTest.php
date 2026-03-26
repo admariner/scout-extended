@@ -16,6 +16,7 @@ class SearchableFinderTest extends TestCase
 {
     public function testWhenThereIsAnUnresolvableClass(): void
     {
+        $this->defaults();
         $this->mockIndex(User::class);
 
         // inject a file that cannot be resolved
