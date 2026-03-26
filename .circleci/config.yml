@@ -95,7 +95,7 @@ workflows:
       - test:
           matrix:
             parameters:
-              version: ['8.2', '8.3', '8.4']
+              version: ['8.2', '8.3', '8.4', '8.5']
               laravel: ['^11.0']
       - test:
           matrix:
