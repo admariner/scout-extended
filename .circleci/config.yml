@@ -12,7 +12,7 @@ aliases:
 
   - &install_dependencies
     name: Install Composer dependencies
-    command: COMPOSER_MEMORY_LIMIT=-1 composer require "orchestra/testbench=^$((<<parameters.laravel>> - 2)).0" --dev --prefer-dist --no-interaction
+    command: COMPOSER_MEMORY_LIMIT=-1 composer require "orchestra/testbench=<<parameters.testbench>>" --dev --prefer-dist --no-interaction
 
   - &save_cache
     name: save Composer cache
@@ -62,6 +62,9 @@ jobs:
       laravel:
         description: "Laravel major version"
         type: string
+      testbench:
+        description: "Orchestra Testbench version constraint"
+        type: string
 
     executor:
       name: php-docker
@@ -87,18 +90,22 @@ workflows:
             parameters:
               version: ['8.1', '8.2']
               laravel: ['10']
+              testbench: ['^8.0']
       - test:
           matrix:
             parameters:
               version: ['8.2', '8.3', '8.4', '8.5']
               laravel: ['11']
+              testbench: ['^9.0']
       - test:
           matrix:
             parameters:
-              version: ['8.2', '8.3', '8.4']
+              version: ['8.2', '8.3', '8.4', '8.5']
               laravel: ['12']
+              testbench: ['^10.0']
       - test:
           matrix:
             parameters:
               version: ['8.3', '8.4', '8.5']
               laravel: ['13']
+              testbench: ['^11.0']
