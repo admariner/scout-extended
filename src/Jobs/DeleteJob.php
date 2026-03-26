@@ -103,6 +103,8 @@ class DeleteJob
     /**
      * Handle deleting objects using the deprecated `deleteBy` method.
      *
+     * @deprecated Use handleDeleteObjects() instead. Enable via scout.algolia.use_deprecated_delete_by for backwards compatibility only.
+     *
      * @param \Algolia\AlgoliaSearch\Api\SearchClient $client
      * @return void
      */
