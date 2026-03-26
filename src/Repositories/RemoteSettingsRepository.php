@@ -115,21 +115,18 @@ class RemoteSettingsRepository
         try {
             $rawSettings = $this->client->getSettings($indexName);
         } catch (NotFoundException $e) {
-            $response = $this->client->saveObjects($indexName, [['objectID' => 'temp']]);
+            $response = $this->client->setSettings($indexName, []);
             $this->client->waitForTask($indexName, $response['taskID']);
             $rawSettings = $this->client->getSettings($indexName);
-            $this->client->clearObjects($indexName);
         }
 
-        $settings = json_decode(json_encode($rawSettings), true) ?? [];
-
         foreach (self::$aliases as $from => $to) {
-            if (array_key_exists($from, $settings)) {
-                $settings[$to] = $settings[$from];
-                unset($settings[$from]);
+            if (array_key_exists($from, $rawSettings)) {
+                $rawSettings[$to] = $rawSettings[$from];
+                unset($rawSettings[$from]);
             }
         }
 
-        return $settings;
+        return $rawSettings;
     }
 }
