@@ -68,9 +68,9 @@ class ReImportCommand extends Command
                 $response = $client->operationIndex(
                     $indexName,
                     (new OperationIndexParams())
-                        ->setOperation(OperationType::COPY)
+                        ->setOperation(OperationType::COPY) // @phpstan-ignore argument.type (generated client uses string constants typed as class)
                         ->setDestination($temporaryName)
-                        ->setScope([ScopeType::SETTINGS, ScopeType::SYNONYMS, ScopeType::RULES])
+                        ->setScope([ScopeType::SETTINGS, ScopeType::SYNONYMS, ScopeType::RULES]) // @phpstan-ignore argument.type (generated client uses string constants typed as class)
                 );
                 $client->waitForTask($temporaryName, $response['taskID']);
             } catch (NotFoundException $e) {
@@ -101,7 +101,7 @@ class ReImportCommand extends Command
                 $response = $client->operationIndex(
                     $temporaryName,
                     (new OperationIndexParams())
-                        ->setOperation(OperationType::MOVE)
+                        ->setOperation(OperationType::MOVE) // @phpstan-ignore argument.type (generated client uses string constants typed as class)
                         ->setDestination($indexName)
                 );
 
