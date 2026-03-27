@@ -67,11 +67,10 @@ class ReImportCommand extends Command
 
                 $response = $client->operationIndex(
                     $indexName,
-                    new OperationIndexParams([
-                        'operation' => OperationType::COPY,
-                        'destination' => $temporaryName,
-                        'scope' => [ScopeType::SETTINGS, ScopeType::SYNONYMS, ScopeType::RULES],
-                    ])
+                    (new OperationIndexParams())
+                        ->setOperation(OperationType::COPY)
+                        ->setDestination($temporaryName)
+                        ->setScope([ScopeType::SETTINGS, ScopeType::SYNONYMS, ScopeType::RULES])
                 );
                 $client->waitForTask($temporaryName, $response['taskID']);
             } catch (NotFoundException $e) {
@@ -101,10 +100,9 @@ class ReImportCommand extends Command
 
                 $response = $client->operationIndex(
                     $temporaryName,
-                    new OperationIndexParams([
-                        'operation' => OperationType::MOVE,
-                        'destination' => $indexName,
-                    ])
+                    (new OperationIndexParams())
+                        ->setOperation(OperationType::MOVE)
+                        ->setDestination($indexName)
                 );
 
                 if ($config->get('scout.synchronous', false)) {
