@@ -75,6 +75,9 @@ class Builder extends BaseBuilder
      */
     public function where($field, $operator, $value = null): self
     {
+        // Here we will make some assumptions about the operator. If only 2 values are
+        // passed to the method, we will assume that the operator is an equals sign
+        // and keep going. Otherwise, we'll require the operator to be passed in.
         if (func_num_args() === 2) {
             return parent::where($field, $this->transform($operator));
         }
